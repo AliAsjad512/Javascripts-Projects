@@ -96,6 +96,7 @@ function showQuestion() {
     const button = document.createElement("button")
     button.textContent = answer.text
     button.classList.add("answer-btn")
+    button.dataset.correct = answer.correct;
   });
 }
 
