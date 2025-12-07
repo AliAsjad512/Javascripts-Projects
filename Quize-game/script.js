@@ -113,8 +113,44 @@ function selectAnswer(event) {
       button.classList.add("incorrect");
     }
   })
+
+ if(isCorrect){
+    score++;
+    scoreSpan.textContent = score;
+ }
+ setTimeout(() => {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizQuestions.length) {
+        showQuestion();
+    } else {
+        showResult();
+    }
+ }, 1000);
 }
 
+function showResult() {
+    quizScreen.classList.remove("active");
+    resultScreen.classList.add("active");
+    finalScoreSpan.textContent = score;
+    const percentage = (score / quizQuestions.length)
+     * 100;
+    if(percentage === 100){
+        resultMessage.textContent = "Perfect Score! Excellent work!";
+    }
+    else if (percentage >= 70) {
+        resultMessage.textContent = "Great job! You passed the quiz.";
+    } 
+    else if(percentage >= 60){
+        resultMessage.textContent = "Good effort! Keep Learning.";
+    }
+    else if(percentage >= 40){
+        resultMessage.textContent = "Not bad! Try again to improve.";
+    }
+    else {
+        resultMessage.textContent = "Better luck next time! Don't give up.";
+    }
+
+}
 
 function restartQuiz() {    console.log("Quiz restarted");
 }
