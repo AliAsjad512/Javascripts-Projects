@@ -86,7 +86,9 @@ function startQuiz() {
 function showQuestion() {
     answersDisabled = false;
    const currentQuestion = quizQuestions[currentQuestionIndex];
-
+   currentQuestionSpan.textContent = currentQuestionIndex + 1;
+   const progressPercent = ((currentQuestionIndex) / quizQuestions.length) * 100;
+  progressBar.style.width = progressPercent + "%";
 
 }
 
