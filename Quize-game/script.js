@@ -83,5 +83,15 @@ function startQuiz() {
 }
 
 
+function showQuestion() {
+    answersDisabled = false;
+   const currentQuestion = quizQuestions[currentQuestionIndex];
+
+
+}
+
+
+
+
 function restartQuiz() {    console.log("Quiz restarted");
 }
