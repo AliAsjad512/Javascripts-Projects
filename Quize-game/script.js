@@ -4,7 +4,7 @@ const resultScreen = document.getElementById("result-screen");
 const startButton = document.getElementById("start-btn");
 const questionText = document.getElementById("question-text");
 const answersContainer = document.getElementById("answers-container");
-const currentQuestionSpan = document.getElementById("current-question");
+const currentQuestionSpan = document.getElementById("currrent-question");
 const totalQuestionsSpan = document.getElementById("total-questions");
 const scoreSpan = document.getElementById("score");
 const finalScoreSpan = document.getElementById("final-score");
@@ -109,7 +109,7 @@ function selectAnswer(event) {
   Array.from(answersContainer.children).forEach((button) => {
     if (button.dataset.correct === "true") {
       button.classList.add("correct");
-    } else {
+    } else if (button === selectedButton) {
       button.classList.add("incorrect");
     }
   })
@@ -152,5 +152,8 @@ function showResult() {
 
 }
 
-function restartQuiz() {    console.log("Quiz restarted");
+function restartQuiz() {   
+    resultScreen.classList.remove("active");
+    startQuiz();
+
 }
