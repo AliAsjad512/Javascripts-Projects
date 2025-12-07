@@ -106,6 +106,13 @@ function selectAnswer(event) {
   answersDisabled = true;
   const selectedButton = event.target;    
   const isCorrect = selectedButton.dataset.correct === "true";  
+  Array.from(answersContainer.children).forEach((button) => {
+    if (button.dataset.correct === "true") {
+      button.classList.add("correct");
+    } else {
+      button.classList.add("incorrect");
+    }
+  })
 }
 
 
