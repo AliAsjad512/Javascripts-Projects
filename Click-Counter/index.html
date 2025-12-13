@@ -38,3 +38,29 @@ margin-left: 10px;
 }
 </style>
 </head>
+<body>
+<div class="game">
+<h1>Click Counter Game</h1>
+<p>Clicks: <span id="count">0</span></p>
+<button class="click" onclick="increase()">Click Me</button>
+<button class="reset" onclick="resetGame()">Reset</button>
+</div>
+
+
+<script>
+let count = 0;
+
+
+function increase() {
+count++;
+document.getElementById('count').textContent = count;
+}
+
+
+function resetGame() {
+count = 0;
+document.getElementById('count').textContent = count;
+}
+</script>
+</body>
+</html>
