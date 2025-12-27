@@ -302,3 +302,171 @@ app.get("/api/seasons", authenticateToken, (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+const express = require("express");
+const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+
+const app = express();
+const PORT = 5000;
+const JWT_SECRET = "your_jwt_secret_key";
+
+app.use(cors());
+app.use(express.json());
+
+const predefinedCategories = ["Shirts", "Pants"];
+
+const users = [];
+const wardrobe = [];
+
+app.post("/api/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const existingUser = users.find((u) => u.username === username);
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exist" });
+    }
+
+    const hashPassword = await bcrypt.hash(password);
+
+    const user = {
+      id: users.length + 1,
+      username,
+      password: hashPassword,
+    };
+    users.push(user);
+    wardrobe[user.id] = {
+      categories: [],
+      clothes: [],
+    };
+
+    const token = jwt.sign({ id: user.id, username }, JWT_SECRET);
+    res.status(201).json({
+      token,
+      user: { id: user.id, username },
+      message: "User registered successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = users.find((u) => u.username === username);
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ id: user.id, username }, JWT_SECRET);
+    res.status(201).json({
+      token,
+      user: { id: user.id, username },
+      message: "Login successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/api/categories", (req, res) => {
+  res.json({ categories: predefinedCategories });
+});
+
+app.get("/api/wardrobe/categories", (req, res) => {
+  const userWardrobe = wardrobe[req.user.id] || {
+    categories: [],
+    clothes: [],
+  };
+
+  res.json({ categories: userWardrobe.categories });
+});
+
+app.post("/api/wardrobe/categories", (req, res) => {
+  const { category } = req.body;
+  const userWardrobe = wardrobe[req.user.id];
+  if (!userWardrobe.categories.includes(category)) {
+    userWardrobe.categories.push(category);
+    userWardrobe.clothes[category] = [];
+  }
+
+  res.json({
+    message: "Category added successfully",
+    categories: userWardrobe.categories,
+  });
+});
+
+app.post("/api/wardrobe/clothes", (req, res) => {
+  const { category, name, image, color, season } = req.body;
+  if (!category || !name || !color || !season || !image) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  const userWardrobe = wardrobe[req.user.id];
+  const newCloth = {
+    id: Date.now(),
+    name,
+    color,
+    image: image,
+    season,
+  };
+
+  userWardrobe.clothes[category].push(newCloth);
+
+  res.status(201).json({ message: "Cloth added successfully" });
+});
+
+app.get("/api/wardrobe/clothes/:category", (req, res) => {
+  const { category } = req.params;
+  const { season } = req.query;
+  const userWardrobe = wardrobe[req.user.id];
+  let clothes = userWardrobe.clothes[category];
+
+  if (season) {
+    clothes = clothes.filter(
+      (cloth) => cloth.season.toLowerCase() === season.toLocaleLowerCase()
+    );
+  }
+
+  res.json({ clothes });
+});
+
+app.put("/api/wardrobe/clothes/:id", (req, res) => {
+  const { id } = req.params;
+  const { category, name, image, color, season } = req.body;
+  if (!category || !name || !color || !season || !image) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  const userWardrobe = wardrobe[req.user.id];
+
+  const clothIndex = userWardrobe.clothes[category].findIndex(
+    (c) => c.id == id
+  );
+  if (clothIndex != -1) {
+    userWardrobe.clothes[cat][clothIndex] = {
+      id: parseInt(id),
+      name,
+      image: image,
+      color,
+      season,
+    };
+  }
+
+  res.json({ message: "Cloth updated successfully" });
+});
+
+app.delete("/api/wardrobe/clothes/:id", (req, res) => {
+  const { id } = req.params;
+  const userWardrobe = wardrobe[req.user.id];
+
+  const clothIndex = userWardrobe.clothes[category].findIndex(
+    (c) => c.id == id
+  );
+  if (clothIndex != -1) {
+    userWardrobe.clothes[category].splice(clothIndex, 1);
+  }
+
+  res.json({ message: "Cloth deleted successfully" });
+});
